@@ -3,6 +3,7 @@ import * as VueRouter from 'vue-router'
 import Home from '../components/Home.vue'
 import QuizBook from '../components/QuizBook.vue'
 import Welcome from '../components/Welcome.vue'
+import Test from '../components/Test.vue'
 
 
 const routes = [
@@ -17,7 +18,12 @@ const routes = [
     {
         path: '/Welcome',
         component: Welcome
-    }
+    },
+    {
+        path: '/Test',
+        component: Test
+    },
+
 ]
 
 const router = VueRouter.createRouter({
