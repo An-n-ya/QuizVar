@@ -6,7 +6,11 @@ import 'element-plus/dist/index.css'
 // 导入 router
 import router from './router/router.js'
 
+
+
 const app = createApp(App)
+
+
 
 // 全局导入 ElementPlus
 app.use(ElementPlus)

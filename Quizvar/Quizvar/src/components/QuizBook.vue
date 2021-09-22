@@ -1,6 +1,6 @@
 <template>
   <div id="root container">
-    <h1>CSS</h1>
+    <h1>{{ this.$route.params.quizbook }}</h1>
     <p>
       <strong>{{ QuizSet.length }}</strong> 个问题
     </p>
@@ -10,7 +10,7 @@
         <el-card
           shadow="never"
           :body-style="{ padding: '0px', height: '100%' }"
-          @click="editQuiz()"
+          @click="showDialog()"
         >
           <div class="addCard">
             <h3><i class="el-icon-circle-plus-outline"></i>添加 Quiz</h3>
@@ -20,9 +20,18 @@
       <el-col :span="6" v-for="(item, index) in QuizSet" :key="'quiz' + index">
         <el-card
           shadow="never"
-          @click="editQuiz(item)"
+          @click="showDialog(item)"
           :body-style="{ padding: '0px' }"
+          @mouseenter="curId = 'Quiz' + index"
+          @mouseleave="curId = null"
         >
+          <!-- 注意到 i 的点击事件需要阻止冒泡，需要往 deleteById 函数中传入 $event参数 -->
+
+          <i
+            class="el-icon-close"
+            v-if="curId == 'Quiz' + index"
+            v-on:click="deleteById(item.quiz_id, $event)"
+          ></i>
           <h3>{{ item.quiz }}</h3>
           <p class="detail">{{ item.ans }}</p>
         </el-card>
@@ -36,7 +45,7 @@
       v-model="dialogVisible"
       width="70%"
     >
-      <el-form ref="form" :model="Quiz">
+      <el-form ref="Quiz" :model="Quiz">
         <el-input v-model="Quiz.quiz" placeholder="Quiz 标题"></el-input>
         <el-input
           :rows="20"
@@ -49,9 +58,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible = false"
-            >保 存</el-button
-          >
+          <el-button type="primary" @click="createQuiz()">保 存</el-button>
         </span>
       </template>
     </el-dialog>
@@ -59,50 +66,124 @@
 </template>
 
 <script>
+// 配置 axios
+import axios from "axios";
+axios.defaults.baseURL = "http://localhost:8787/api/";
 export default {
   data() {
     return {
+      // 当前 QuizCard 的 index
+      curId: null,
       // 控制弹框的显示
       dialogVisible: false,
+      QuizBook: "",
       Quiz: {
+        quiz_id: "",
         quiz: "",
         ans: "",
+        category: "",
+        date: "",
+        editdate: "",
+        author: "",
+        quizbook: "",
+        createFlag: false,
       },
       QuizSet: [
         {
-          quiz: "怎么更改 ul 默认标记符？",
-          ans: `使用 list-style-type ，使用none可以不显示 marker，使用circle，disc，square甚至是 emoji 字符可以更改 marker 样式。`,
-        },
-        {
-          quiz: "CSS 属性的值可以是什么？",
-          ans: `可以是
-
-                    1. 数字 + 单位
-
-                    2. 函数，比如：translate() rgb() calc() rorate()`,
-        },
-        {
-          quiz: "CSS 选择器的优先级？",
-          ans: `id 选择器 > 类选择器 = 属性选择器 = 伪类选择器 > 标签选择器 = 伪元素选择器
-
-                    若选择器优先级相同，则后面的样式将覆盖前面的样式。
-
-                    通用选择器（*），选择符（+ > ～）以及否定伪类（：not）不会影响优先级。
-
-                    按 CSS 来源来分，内联样式 > 内部样式 > 外部样式 > 浏览器用户自定义样式 > 浏览器默认样式`,
+          quiz_id: "",
+          quiz: "",
+          ans: "",
+          category: "",
+          date: "",
+          editdate: "",
+          author: "",
+          quizbook: "",
         },
       ],
     };
   },
+  created() {
+    this.QuizBook = this.$route.params.quizbook;
+    this.getQuizSet();
+  },
   methods: {
-    editQuiz(item) {
+    async getQuizSet() {
+      const { data: res } = await axios.get("searchbybook/" + this.QuizBook);
+      if (res.status !== 200) {
+        this.$message({
+          message: "获取数据失败",
+          type: "danger",
+        });
+      }
+      this.QuizSet = res.QuizSet;
+    },
+    showDialog(item) {
       this.dialogVisible = true;
       if (item) {
         this.Quiz = item;
+        this.createFlag = false;
       } else {
-        this.Quiz = { quiz: "", and: "" };
+        this.Quiz = { quiz: "", and: "", createFlag: true };
       }
       // console.log(item);
+    },
+    async createQuiz() {
+      if (this.Quiz.createFlag) {
+        // 使用默认的 cate author quizbook
+        // this.Quiz.category = this.QuizSet[0].category;
+        this.Quiz.author = "ankh";
+        this.Quiz.quizbook = this.$route.params.quizbook;
+        const { data: res } = await axios.post("insert", this.Quiz);
+        if (res.status !== 200) {
+          this.$message({
+            message: "获取数据失败",
+            type: "danger",
+          });
+        }
+        this.$message({
+          message: "添加成功",
+          type: "success",
+        });
+        // 重新获取数据
+        this.getQuizSet();
+        // 关闭窗口
+        this.dialogVisible = false;
+      } else {
+        // console.log("entering update");
+        const { data: res } = await axios.put("update", this.Quiz);
+        if (res.status !== 200) {
+          this.$message({
+            message: "获取数据失败",
+            type: "danger",
+          });
+        }
+        this.$message({
+          message: "修改成功",
+          type: "success",
+        });
+        // 重新获取数据
+        this.getQuizSet();
+        // 关闭窗口
+        this.dialogVisible = false;
+      }
+    },
+    async deleteById(id, event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      const { data: res } = await axios.delete("delete/" + id);
+      if (res.status !== 200) {
+        this.$message({
+          message: "删除失败",
+          type: "danger",
+        });
+      }
+      this.$message({
+        message: "删除成功",
+        type: "success",
+      });
+      // 重新获取数据
+      this.getQuizSet();
     },
   },
 };
@@ -110,6 +191,7 @@ export default {
 
 <style scoped>
 .el-card {
+  position: relative;
   padding: 0;
   height: 198px; /*调整到刚好显示 7 行*/
   overflow: hidden;
@@ -139,5 +221,15 @@ export default {
 .ansBox {
   margin-top: 20px;
   height: 400px;
+}
+
+/* 删除图标样式 */
+.el-col .el-card i {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+.el-col .el-card i:hover {
+  color: blue;
 }
 </style>

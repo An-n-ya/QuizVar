@@ -12,7 +12,7 @@ const routes = [
         component: Home
     },
     {
-        path: '/QuizPamphlet',
+        path: '/QuizPamphlet/:quizbook',
         component: QuizBook
     },
     {
@@ -20,7 +20,7 @@ const routes = [
         component: Welcome
     },
     {
-        path: '/Test',
+        path: '/Test/:quizbook',
         component: Test
     },
 

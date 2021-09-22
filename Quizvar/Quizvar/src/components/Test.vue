@@ -29,38 +29,38 @@
 </template>
 
 <script>
+// 配置 axios
+import axios from "axios";
+axios.defaults.baseURL = "http://localhost:8787/api/";
 export default {
   data() {
     return {
       active: true,
       currentInd: 0,
+      QuizBook: "",
       QuizSet: [
         {
-          quiz: "怎么更改 ul 默认标记符？",
-          ans: `使用 list-style-type ，使用none可以不显示 marker，使用circle，disc，square甚至是 emoji 字符可以更改 marker 样式。`,
-        },
-        {
-          quiz: "CSS 属性的值可以是什么？",
-          ans: `可以是
-
-                    1. 数字 + 单位
-
-                    2. 函数，比如：translate() rgb() calc() rorate()`,
-        },
-        {
-          quiz: "CSS 选择器的优先级？",
-          ans: `id 选择器 > 类选择器 = 属性选择器 = 伪类选择器 > 标签选择器 = 伪元素选择器
-
-                    若选择器优先级相同，则后面的样式将覆盖前面的样式。
-
-                    通用选择器（*），选择符（+ > ～）以及否定伪类（：not）不会影响优先级。
-
-                    按 CSS 来源来分，内联样式 > 内部样式 > 外部样式 > 浏览器用户自定义样式 > 浏览器默认样式`,
+          quiz: "",
+          ans: "",
         },
       ],
     };
   },
+  created() {
+    this.QuizBook = this.$route.params.quizbook;
+    this.getQuizSet();
+  },
   methods: {
+    async getQuizSet() {
+      const { data: res } = await axios.get("searchbybook/" + this.QuizBook);
+      if (res.status !== 200) {
+        this.$message({
+          message: "获取数据失败",
+          type: "danger",
+        });
+      }
+      this.QuizSet = res.QuizSet;
+    },
     toggleActive() {
       this.active = !this.active;
     },

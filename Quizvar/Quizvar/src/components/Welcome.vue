@@ -2,8 +2,12 @@
   <div id="root-container">
     <el-card shadow="never" id="welcome">
       <h1>欢迎来到 Quizvar！👏</h1>
-      <p>🎊 您已经创建了 <strong>xx</strong> 个问题本</p>
-      <p>🎉 您已经在 Quizvar 创建了 <strong>xx</strong> 个问题了！</p>
+      <p>
+        🎊 您已经创建了 <strong>{{ totalQuizBook }}</strong> 个问题本
+      </p>
+      <p>
+        🎉 您已经在 Quizvar 创建了 <strong>{{ totalQuiz }}</strong> 个问题了！
+      </p>
       <p>💪 您今天还有 <strong>xx</strong> 个问题本需要复习</p>
     </el-card>
 
@@ -13,12 +17,12 @@
     <el-row :gutter="20">
       <el-col
         :span="6"
-        v-for="(item, index) in NClassified"
+        v-for="(item, index) in NQuizBook"
         :key="'NClass' + index"
       >
         <el-card
           shadow="never"
-          @click="navTo('/Test', $event)"
+          @click="navTo('/Test/' + item.quizbook, $event)"
           @mouseenter="curId = 'NClass' + index"
           @mouseleave="curId = null"
         >
@@ -26,90 +30,63 @@
           <i
             class="el-icon-edit-outline"
             v-if="curId == 'NClass' + index"
-            v-on:click="navTo('/QuizPamphlet', $event)"
+            v-on:click="navTo('/QuizPamphlet/' + item.quizbook, $event)"
           ></i>
-          <h2>{{ item.title }}</h2>
-          <p class="detail">{{ item.NumOfQuiz }} 个问题</p>
+          <h2>{{ item.quizbook }}</h2>
+          <p class="detail">{{ item.quiz_num }} 个问题</p>
         </el-card>
       </el-col>
     </el-row>
 
     <!-- 已归档的问题本 -->
-    <h1>JS 文件夹</h1>
-    <el-row :gutter="20">
-      <el-col
-        :span="6"
-        v-for="(item, index) in classified"
-        :key="'Class' + index"
-      >
-        <el-card
-          shadow="never"
-          @click="navTo('/Test', $event)"
-          @mouseenter="curId = 'Class' + index"
-          @mouseleave="curId = null"
-        >
-          <!-- 注意到 i 的点击事件需要阻止冒泡，需要往 navTo 函数中传入 $event参数 -->
-          <i
-            class="el-icon-edit-outline"
-            v-if="curId == 'Class' + index"
-            v-on:click="navTo('/QuizPamphlet', $event)"
-          ></i>
-          <h2>{{ item.title }}</h2>
-          <p class="detail">{{ item.NumOfQuiz }} 个问题</p>
-        </el-card>
-      </el-col>
-    </el-row>
+    <!-- 遍历每个分类 -->
+    <div v-for="(val, key, index) in QuizBooks" :key="'BookClass' + index">
+      <h1>{{ key }}</h1>
+      <el-row :gutter="20">
+        <!-- 遍历该分类内的所有问题本 -->
+        <el-col :span="6" v-for="(item, index2) in val" :key="'Class' + index2">
+          <el-card
+            shadow="never"
+            @click="navTo('/Test/' + item.quizbook, $event)"
+            @mouseenter="curId = 'Class' + index2"
+            @mouseleave="curId = null"
+          >
+            <!-- 注意到 i 的点击事件需要阻止冒泡，需要往 navTo 函数中传入 $event参数 -->
+            <i
+              class="el-icon-edit-outline"
+              v-if="curId == 'Class' + index2"
+              v-on:click="navTo('/QuizPamphlet/' + item.quizbook, $event)"
+            ></i>
+            <h2>{{ item.quizbook }}</h2>
+            <p class="detail">{{ item.quiz_num }} 个问题</p>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <script>
+// 配置 axios
+import axios from "axios";
+axios.defaults.baseURL = "http://localhost:8787/api/";
 export default {
   data() {
     return {
       // 用来表示当前鼠标 hover 的卡片
       curId: null,
-      // 问题本
-      NClassified: [
-        {
-          title: "CSS",
-          NumOfQuiz: 4,
-        },
-        {
-          title: "HTML",
-          NumOfQuiz: 10,
-        },
-        {
-          title: "JS",
-          NumOfQuiz: 23,
-        },
-        {
-          title: "VUE",
-          NumOfQuiz: 18,
-        },
-        {
-          title: "REACT",
-          NumOfQuiz: 20,
-        },
-        {
-          title: "NETWORK",
-          NumOfQuiz: 10,
-        },
-      ],
-      classified: [
-        {
-          title: "CSS",
-          NumOfQuiz: 4,
-        },
-        {
-          title: "HTML",
-          NumOfQuiz: 10,
-        },
-        {
-          title: "JS",
-          NumOfQuiz: 23,
-        },
-      ],
+      // 已分类的 QuizBook
+      QuizBooks: {},
+      // 未分类的 QuizBook
+      NQuizBook: [],
+      // 总问题本数
+      totalQuizBook: 0,
+      // 总 Quiz 数
+      totalQuiz: 0,
     };
+  },
+  created() {
+    this.getQuizSet();
   },
   methods: {
     navTo(address, event) {
@@ -118,6 +95,27 @@ export default {
         event.stopPropagation();
       }
       this.$router.push(address);
+    },
+    async getQuizSet() {
+      const { data: res } = await axios.get("nullquizbook");
+      this.NQuizBook = res.QuizBook;
+      // 统计未分类的问题本数
+      this.totalQuizBook += this.NQuizBook.length;
+      // 统计各个分类问题本里的问题数
+      this.NQuizBook.forEach((item) => {
+        this.totalQuiz += item.quiz_num;
+      });
+      const { data: cate } = await axios.get("category");
+      cate.category.forEach(async (item) => {
+        let { data: book } = await axios.get("quizbook/" + item.category);
+        this.QuizBooks[item.category] = book.QuizBook;
+        // 统计各个分类的问题本数
+        this.totalQuizBook += book.QuizBook.length;
+        // 统计各个分类问题本里的问题数
+        book.QuizBook.forEach((item) => {
+          this.totalQuiz += item.quiz_num;
+        });
+      });
     },
   },
 };
