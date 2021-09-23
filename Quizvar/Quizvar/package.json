@@ -7,6 +7,11 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@milkdown/core": "^4.12.0",
+    "@milkdown/plugin-listener": "^4.12.0",
+    "@milkdown/plugin-prism": "^4.12.0",
+    "@milkdown/preset-commonmark": "^4.12.0",
+    "@milkdown/vue": "^4.12.0",
     "axios": "^0.21.4",
     "element-plus": "^1.1.0-beta.12",
     "vue": "^3.2.6",

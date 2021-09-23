@@ -10,7 +10,8 @@
         <h1>{{ QuizSet[currentInd].quiz }}</h1>
       </el-card>
       <el-card shadow="never" style="margin-bottom: 20px">
-        <p>{{ QuizSet[currentInd].ans }}</p>
+        <!-- <p>{{ QuizSet[currentInd].ans }}</p> -->
+        <MilkDown :modelValue="QuizSet[currentInd].ans" :readonly="true" />
       </el-card>
       <div class="selection">
         <el-button
@@ -32,7 +33,26 @@
 // 配置 axios
 import axios from "axios";
 axios.defaults.baseURL = "http://localhost:8787/api/";
+// Fisher-Yates shuffle 打乱算法
+Array.prototype.shuffle = function () {
+  var array = this;
+  var m = array.length,
+    t,
+    i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+};
+// 导入 Milkdown
+import MilkDown from "./Milkdown.vue";
 export default {
+  components: {
+    MilkDown,
+  },
   data() {
     return {
       active: true,
@@ -60,6 +80,7 @@ export default {
         });
       }
       this.QuizSet = res.QuizSet;
+      this.QuizSet.shuffle();
     },
     toggleActive() {
       this.active = !this.active;

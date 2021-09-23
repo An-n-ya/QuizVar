@@ -42,7 +42,10 @@
             v-on:click="deleteById(item.quiz_id, $event)"
           ></i>
           <h3>{{ item.quiz }}</h3>
-          <p class="detail">{{ item.ans }}</p>
+          <!-- <p class="detail">{{ item.ans }}</p> -->
+          <div class="milkdown">
+            <MilkDown :modelValue="check(item.ans)" :readonly="true" />
+          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -52,17 +55,23 @@
       id="editBox"
       title="修改 Quiz"
       v-model="dialogVisible"
+      destroy-on-close
       width="70%"
     >
       <el-form ref="Quiz" :model="Quiz">
-        <el-input v-model="Quiz.quiz" placeholder="Quiz 标题"></el-input>
         <el-input
+          v-model="Quiz.quiz"
+          placeholder="Quiz 标题"
+          class="quizTitle"
+        ></el-input>
+        <!-- <el-input
           :rows="20"
           type="textarea"
           v-model="Quiz.ans"
           class="ansBox"
           placeholder="Quiz 答案"
-        ></el-input>
+        ></el-input> -->
+        <div class="milkdownContainer"><MilkDown v-model="Quiz.ans" /></div>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -77,8 +86,12 @@
 <script>
 // 配置 axios
 import axios from "axios";
+import MilkDown from "./Milkdown.vue";
 axios.defaults.baseURL = "http://localhost:8787/api/";
 export default {
+  components: {
+    MilkDown,
+  },
   data() {
     return {
       // 控制标题的编辑与否
@@ -125,6 +138,10 @@ export default {
     },
   },
   methods: {
+    check(res) {
+      console.log(res);
+      return res;
+    },
     // 获取初始数据
     async getQuizSet() {
       const { data: res } = await axios.get(
@@ -141,7 +158,6 @@ export default {
 
     // 将标题转为输入框
     toInput() {
-      console.log("input");
       this.inputActive = true;
     },
 
@@ -151,10 +167,10 @@ export default {
       if (item) {
         this.Quiz = item;
         this.createFlag = false;
+        console.log(this.Quiz.ans);
       } else {
         this.Quiz = { quiz: "", and: "", createFlag: true };
       }
-      // console.log(item);
     },
     async createQuiz() {
       if (this.Quiz.createFlag) {
@@ -190,7 +206,6 @@ export default {
         // 关闭窗口
         this.dialogVisible = false;
       } else {
-        // console.log("entering update");
         const { data: res } = await axios.put("update", this.Quiz);
         if (res.status !== 200) {
           this.$message({
@@ -267,6 +282,9 @@ export default {
   margin-top: 20px;
   height: 400px;
 }
+.quizTitle {
+  font-size: 16px;
+}
 
 /* 删除图标样式 */
 .el-icon-close {
@@ -276,5 +294,18 @@ export default {
 }
 .el-icon-close:hover {
   color: blue;
+}
+
+/* milkdown */
+.milkdownContainer {
+  height: 350px;
+  overflow: auto;
+  padding: 0 15px;
+  margin-top: 20px;
+  border: 1px solid rgb(220, 223, 230);
+  border-radius: 4px;
+}
+.milkdown {
+  padding: 0 15px;
 }
 </style>
