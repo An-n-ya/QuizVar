@@ -1,6 +1,15 @@
 <template>
   <div id="root container">
-    <h1>{{ this.$route.params.quizbook }}</h1>
+    <h1 @click="toInput" id="title" v-show="inputActive == false">
+      {{ currentTitle }}
+    </h1>
+    <el-input
+      v-show="inputActive"
+      v-model="bookTitle"
+      :placeholder="currentTitle"
+      @blur="inputActive = false"
+      class="inputTitle"
+    ></el-input>
     <p>
       <strong>{{ QuizSet.length }}</strong> 个问题
     </p>
@@ -72,11 +81,13 @@ axios.defaults.baseURL = "http://localhost:8787/api/";
 export default {
   data() {
     return {
+      // 控制标题的编辑与否
+      inputActive: false,
+      bookTitle: "",
       // 当前 QuizCard 的 index
       curId: null,
       // 控制弹框的显示
       dialogVisible: false,
-      QuizBook: "",
       Quiz: {
         quiz_id: "",
         quiz: "",
@@ -103,12 +114,22 @@ export default {
     };
   },
   created() {
-    this.QuizBook = this.$route.params.quizbook;
     this.getQuizSet();
   },
+  computed: {
+    // 当前 QuizBook 的名称
+    currentTitle() {
+      return this.bookTitle == ""
+        ? this.$route.params.quizbook
+        : this.bookTitle;
+    },
+  },
   methods: {
+    // 获取初始数据
     async getQuizSet() {
-      const { data: res } = await axios.get("searchbybook/" + this.QuizBook);
+      const { data: res } = await axios.get(
+        "searchbybook/" + this.currentTitle
+      );
       if (res.status !== 200) {
         this.$message({
           message: "获取数据失败",
@@ -117,6 +138,14 @@ export default {
       }
       this.QuizSet = res.QuizSet;
     },
+
+    // 将标题转为输入框
+    toInput() {
+      console.log("input");
+      this.inputActive = true;
+    },
+
+    // 控制弹出框
     showDialog(item) {
       this.dialogVisible = true;
       if (item) {
@@ -131,8 +160,20 @@ export default {
       if (this.Quiz.createFlag) {
         // 使用默认的 cate author quizbook
         // this.Quiz.category = this.QuizSet[0].category;
+        if (this.currentTitle == "CreateBook") {
+          this.$message({
+            message: "请先更改 QuizBook 的名称",
+            type: "warning",
+          });
+          // 关闭窗口
+          this.dialogVisible = false;
+          return;
+        }
         this.Quiz.author = "ankh";
-        this.Quiz.quizbook = this.$route.params.quizbook;
+        this.Quiz.quizbook = this.currentTitle;
+        if (this.QuizSet.length !== 0) {
+          this.Quiz.category = this.QuizSet[0].category;
+        }
         const { data: res } = await axios.post("insert", this.Quiz);
         if (res.status !== 200) {
           this.$message({
@@ -190,6 +231,10 @@ export default {
 </script>
 
 <style scoped>
+#title {
+  cursor: pointer;
+}
+
 .el-card {
   position: relative;
   padding: 0;
@@ -224,12 +269,12 @@ export default {
 }
 
 /* 删除图标样式 */
-.el-col .el-card i {
+.el-icon-close {
   position: absolute;
   right: 10px;
   top: 10px;
 }
-.el-col .el-card i:hover {
+.el-icon-close:hover {
   color: blue;
 }
 </style>

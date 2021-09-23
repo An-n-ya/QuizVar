@@ -38,6 +38,9 @@ HAVING category IS NOT NULL
 // 插入一个 Quiz
 const sql_insert = "INSERT INTO quizvar.category (quiz, ans, category, date, editdate, author, quizbook) VALUES (?, ?, ?, ?, ?, ?, ?);"
 
+
+
+
 // 按 id 删除 Quiz
 const sql_delete = "DELETE FROM `quizvar`.`category` WHERE (`quiz_id` = ?);"
 

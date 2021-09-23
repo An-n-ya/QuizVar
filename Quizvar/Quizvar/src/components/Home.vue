@@ -31,7 +31,9 @@
           </el-sub-menu>
           <el-sub-menu index="3">
             <template #title>创建</template>
-            <el-menu-item index="3-1">问题本</el-menu-item>
+            <el-menu-item index="3-1" @click="navToCreateBook"
+              >问题本</el-menu-item
+            >
             <el-menu-item index="3-2">文件夹</el-menu-item>
           </el-sub-menu>
         </el-menu>
@@ -55,6 +57,9 @@ export default {
     },
     navToWel() {
       this.$router.push("/Welcome");
+    },
+    navToCreateBook() {
+      this.$router.push("/QuizPamphlet/CreateBook");
     },
   },
   created() {
