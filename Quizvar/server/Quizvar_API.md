@@ -2,7 +2,7 @@
 
 ## API接口说明
 
-* 接口地址：`http://qiucle.cn:8787/api/`
+* 接口地址：`https://qiucle.cn:8787/api/`
 * 服务器端已开启 CORS 跨域支持
 * 认证统一使用 Token 认证
 * 需要授权的 API ，必须在请求头中使用 `Authorization` 字段提供 `token` 令牌
@@ -27,7 +27,7 @@
 | 403      | FORBIDDEN             | 被禁止访问                           |
 | 500      | INTERNAL SERVER ERROR | 内部错误                             |
 
-## Quiz 管理
+## 获取Quiz 
 
 ### 获取 Quiz 列表
 
@@ -65,7 +65,130 @@
 }
 ```
 
-### 删除 Quiz
+### 获取 QuizBook
+
+* 请求路径：`quizbook/:cate`
+* 请求方法：`get`
+* 请求参数
+
+| 参数名 | 参数说明            | 备注     |
+| ------ | ------------------- | -------- |
+| Cate   | QuizBook 的分类名称 | 不能为空 |
+
+- 响应参数
+
+| 参数名   | 参数说明      | 备注                    |
+| -------- | ------------- | ----------------------- |
+| QuizBook | QuizBook 列表 | 该分类下的所有 QuizBook |
+
+* 响应数据
+
+```json
+{
+    "status": 200,
+    "message": "获取成功",
+    "QuizBook": [
+        {
+            "quizbook": "CSS",
+            "quiz_num": 2
+        },
+        {
+            "quizbook": "Vue",
+            "quiz_num": 2
+        },
+        {
+            "quizbook": "JavaScript",
+            "quiz_num": 10
+        },
+        {
+            "quizbook": "HTML",
+            "quiz_num": 3
+        }
+    ]
+}
+```
+
+### 获取 QuizBook 分类
+
+* 请求路径：`category`
+* 请求方法：`get`
+* 响应参数
+
+| 参数名            | 参数说明                   | 备注         |
+| ----------------- | -------------------------- | ------------ |
+| category          | 分类不为 null 的 category  | 类型为 Array |
+| category.category | 当前分类的名称             |              |
+| category.cate_num | 当前分类的下 Quiz 的总数量 |              |
+
+* 响应数据
+
+```json
+{
+    "status": 200,
+    "message": "获取成功",
+    "category": [
+        {
+            "category": "前端",
+            "cate_num": 17
+        },{
+          	"category": "后端",
+          	"cate_num": 13
+        }
+    ]
+}
+```
+
+### 按 QuizBook 查找 Quiz
+
+* 请求路径：`searchByBook/:quizbook`
+* 请求方法：`get`
+
+* 请求参数
+
+| 参数名   | 参数说明            | 备注     |
+| -------- | ------------------- | -------- |
+| quizbook | 需要查找的 QuizBook | 不能为空 |
+
+- 响应参数
+
+| 参数名  | 参数说明                            | 备注 |
+| ------- | ----------------------------------- | ---- |
+| QuizSet | 数组，存储该 QuizBook 下的所有 Quiz |      |
+
+* 响应数据
+
+```json
+{
+    "status": 200,
+    "message": "获取成功",
+    "QuizSet": [
+        {
+            "quiz_id": 1,
+            "quiz": "怎么更改 ul 默认标记符？",
+            "ans": "使用 list-style-type ，使用none可以不显示 marker，使用circle，disc，square甚至是 emoji 字符可以更改 marker 样式。",
+            "category": "前端",
+            "date": "1632140223206",
+            "editdate": "1632143270465",
+            "author": "ankh",
+            "quizbook": "CSS"
+        },
+        {
+            "quiz_id": 2,
+            "quiz": "什么是选择符？",
+            "ans": "选择符就是把不同选择器组合在一起的符号。\n\n最常见的选择符是 后代选择符 。也就是简单的一个空格\" \"。 对于后代选择符，它的第二个选择器是第一个选择器的后代。\n\n子选择符为：\">\"。它的第二个选择器选择的元素是第一个选择器对应的元素的 直接子元素。\n\n临近兄弟选择符为：\"+\"。它的第二个选择器对应的元素是第一个选择器对应元素的 下一个兄弟元素。\n\n通用兄弟选择符为：'~'。它与临近兄弟选择符+很相似，只不过它选择的是所有的兄弟元素。",
+            "category": "前端",
+            "date": "1632144574807",
+            "editdate": "1632144574807",
+            "author": "ankh",
+            "quizbook": "CSS"
+        }
+    ]
+}
+```
+
+
+
+## 删除 Quiz
 
 * 请求路径：`delete/:id`
 * 请求方法：`delete`
@@ -101,7 +224,7 @@
 }
 ```
 
-### 添加 Quiz
+## 添加 Quiz
 
 * 请求路径：`insert`
 * 请求方法：`post`
