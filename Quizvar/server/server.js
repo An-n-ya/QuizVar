@@ -11,6 +11,8 @@ server.use(express.urlencoded({ extended: false }))
 
 server.use('/api', router)
 
-server.listen(8787, () => {
-    console.log('Server is running!');
-})
+// server.listen(8787, () => {
+//     console.log('Server is running!');
+// })
+
+module.exports = server
