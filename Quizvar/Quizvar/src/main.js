@@ -9,7 +9,7 @@ import router from './router/router.js'
 
 // 配置 axios
 import axios from "axios";
-axios.defaults.baseURL = "http://qiucle.cn:8787/api/";
+axios.defaults.baseURL = "https://qiucle.cn:8787/api/";
 
 
 
