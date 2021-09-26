@@ -1,7 +1,21 @@
-# Vue 3 + Vite
+# QuizVar 前端部署说明
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 安装教程
 
-## Recommended IDE Setup
+1. 进入到 Quizvar 目录，安装依赖。
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+```shell
+cd Quizvar
+yarn
+```
+
+2. 配置服务器地址。
+
+进入 `./src/main.JavaScript`，在 `axis.defaults.baseURL`中写入服务器的 API 地址。
+
+3. 运行应用
+
+```shell
+yarn dev
+```
+
