@@ -12,23 +12,12 @@
           @select="handleSelect"
         >
           <div id="icon">
+            <!-- dahsfhlas -->
             <el-link class="link" :underline="false" @click="haha"
               >Quizvar</el-link
             >
           </div>
           <el-menu-item index="1" @click="haha">主页</el-menu-item>
-          <!-- <el-sub-menu index="2">
-            <template #title>我的问题本</template>
-            <el-menu-item index="2-1">选项1</el-menu-item>
-            <el-menu-item index="2-2">选项2</el-menu-item>
-            <el-menu-item index="2-3">选项3</el-menu-item>
-            <el-sub-menu index="2-4">
-              <template #title>选项4</template>
-              <el-menu-item index="2-4-1">选项1</el-menu-item>
-              <el-menu-item index="2-4-2">选项2</el-menu-item>
-              <el-menu-item index="2-4-3">选项3</el-menu-item>
-            </el-sub-menu>
-          </el-sub-menu> -->
           <el-sub-menu index="3">
             <template #title>创建</template>
             <el-menu-item index="3-1" @click="navToCreateBook"
@@ -51,8 +40,6 @@
 export default {
   methods: {
     haha() {
-      // console.log("hha");
-      //   console.log(this);
       this.$router.push("/");
     },
     navToWel() {

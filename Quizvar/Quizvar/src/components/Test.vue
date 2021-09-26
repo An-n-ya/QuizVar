@@ -30,9 +30,6 @@
 </template>
 
 <script>
-// 配置 axios
-import axios from "axios";
-axios.defaults.baseURL = "http://localhost:8787/api/";
 // Fisher-Yates shuffle 打乱算法
 Array.prototype.shuffle = function () {
   var array = this;
@@ -72,7 +69,7 @@ export default {
   },
   methods: {
     async getQuizSet() {
-      const { data: res } = await axios.get("searchbybook/" + this.QuizBook);
+      const { data: res } = await this.$http.get("searchbybook/" + this.QuizBook);
       if (res.status !== 200) {
         this.$message({
           message: "获取数据失败",

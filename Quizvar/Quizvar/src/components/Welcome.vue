@@ -67,9 +67,6 @@
 </template>
 
 <script>
-// 配置 axios
-import axios from "axios";
-axios.defaults.baseURL = "http://localhost:8787/api/";
 export default {
   data() {
     return {
@@ -97,7 +94,7 @@ export default {
       this.$router.push(address);
     },
     async getQuizSet() {
-      const { data: res } = await axios.get("nullquizbook");
+      const { data: res } = await this.$http.get("nullquizbook");
       this.NQuizBook = res.QuizBook;
       // 统计未分类的问题本数
       this.totalQuizBook += this.NQuizBook.length;
@@ -105,9 +102,9 @@ export default {
       this.NQuizBook.forEach((item) => {
         this.totalQuiz += item.quiz_num;
       });
-      const { data: cate } = await axios.get("category");
+      const { data: cate } = await this.$http.get("category");
       cate.category.forEach(async (item) => {
-        let { data: book } = await axios.get("quizbook/" + item.category);
+        let { data: book } = await this.$http.get("quizbook/" + item.category);
         this.QuizBooks[item.category] = book.QuizBook;
         // 统计各个分类的问题本数
         this.totalQuizBook += book.QuizBook.length;

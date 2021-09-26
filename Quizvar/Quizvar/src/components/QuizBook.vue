@@ -44,7 +44,7 @@
           <h3>{{ item.quiz }}</h3>
           <!-- <p class="detail">{{ item.ans }}</p> -->
           <div class="milkdown">
-            <MilkDown :modelValue="check(item.ans)" :readonly="true" />
+            <MilkDown :modelValue="item.ans" :readonly="true" />
           </div>
         </el-card>
       </el-col>
@@ -84,10 +84,7 @@
 </template>
 
 <script>
-// 配置 axios
-import axios from "axios";
 import MilkDown from "./Milkdown.vue";
-axios.defaults.baseURL = "http://localhost:8787/api/";
 export default {
   components: {
     MilkDown,
@@ -139,12 +136,12 @@ export default {
   },
   methods: {
     check(res) {
-      console.log(res);
+      // console.log(res);
       return res;
     },
     // 获取初始数据
     async getQuizSet() {
-      const { data: res } = await axios.get(
+      const { data: res } = await this.$http.get(
         "searchbybook/" + this.currentTitle
       );
       if (res.status !== 200) {
@@ -167,7 +164,6 @@ export default {
       if (item) {
         this.Quiz = item;
         this.createFlag = false;
-        console.log(this.Quiz.ans);
       } else {
         this.Quiz = { quiz: "", and: "", createFlag: true };
       }
@@ -190,7 +186,7 @@ export default {
         if (this.QuizSet.length !== 0) {
           this.Quiz.category = this.QuizSet[0].category;
         }
-        const { data: res } = await axios.post("insert", this.Quiz);
+        const { data: res } = await this.$http.post("insert", this.Quiz);
         if (res.status !== 200) {
           this.$message({
             message: "获取数据失败",
@@ -206,7 +202,7 @@ export default {
         // 关闭窗口
         this.dialogVisible = false;
       } else {
-        const { data: res } = await axios.put("update", this.Quiz);
+        const { data: res } = await this.$http.put("update", this.Quiz);
         if (res.status !== 200) {
           this.$message({
             message: "获取数据失败",
@@ -227,7 +223,7 @@ export default {
       if (event) {
         event.stopPropagation();
       }
-      const { data: res } = await axios.delete("delete/" + id);
+      const { data: res } = await this.$http.delete("delete/" + id);
       if (res.status !== 200) {
         this.$message({
           message: "删除失败",
